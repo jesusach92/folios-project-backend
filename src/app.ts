@@ -14,6 +14,8 @@ import projectRoutes from "./routes/projects.routes";
 import sectionRoutes from "./routes/sections.routes";
 import folioRoutes from "./routes/folios.routes";
 import processRoutes from "./routes/processes.routes";
+import demoRoutes from "./routes/demo.routes";
+import dashboardRoutes from "./routes/dashboard.routes";
 
 dotenv.config();
 
@@ -27,19 +29,23 @@ app.use((req, _res, next) => {
   next();
 });
 
+
+
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/clients", clientRoutes);
-app.use("/projects", projectRoutes);
-app.use("/sections", sectionRoutes);
-app.use("/folios", folioRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/sections", sectionRoutes);
+app.use("/api/folios", folioRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/processes", processRoutes);
+app.use("/api/admin/demo", demoRoutes);
 
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });

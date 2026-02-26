@@ -73,21 +73,21 @@ import { AuthController } from "../controllers/AuthController";
  *                 type: string
  *                 format: password
  *                 example: password123
- *               full_name:
+ *               fullName:
  *                 type: string
  *                 example: John Doe
- *               role_id:
+ *               role:
  *                 type: integer
  *                 example: 1
- *               section_id:
+ *               section:
  *                 type: integer
  *                 nullable: true
  *                 example: null
  *             required:
  *               - email
  *               - password
- *               - full_name
- *               - role_id
+ *               - fullName
+ *               - role
  *     responses:
  *       201:
  *         description: Registration successful
@@ -108,10 +108,14 @@ import { AuthController } from "../controllers/AuthController";
  *               $ref: '#/components/schemas/Error'
  */
 
+import { authMiddleware } from "../middlewares/auth";
+
 const router = Router();
 const authController = new AuthController();
 
 router.post("/login", (req: Request, res: Response) => authController.login(req, res));
 router.post("/register", (req: Request, res: Response) => authController.register(req, res));
+router.get("/profile", authMiddleware, (req: Request, res: Response) => authController.getProfile(req, res));
+router.post("/logout", authMiddleware, (req: Request, res: Response) => authController.logout(req, res));
 
 export default router;

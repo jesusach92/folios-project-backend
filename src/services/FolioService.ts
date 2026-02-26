@@ -7,6 +7,45 @@ export class FolioService {
   private folioRepository = new FolioRepository();
   private auditRepository = new AuditRepository();
 
+  async getFolios(filters: {
+    search?: string;
+    status?: string;
+    projectId?: number;
+    sortBy?: 'created_at' | 'folio_number';
+    sortOrder?: 'asc' | 'desc';
+    page?: number;
+    pageSize?: number;
+  } = {}): Promise<{ folios: Folio[]; total: number; page: number; pageSize: number }> {
+    const page = filters.page || 1;
+    const pageSize = filters.pageSize || 50;
+    const offset = (page - 1) * pageSize;
+
+    const result = await this.folioRepository.findAll({
+      search: filters.search,
+      status: filters.status,
+      projectId: filters.projectId,
+      sortBy: filters.sortBy || 'created_at',
+      sortOrder: filters.sortOrder || 'desc',
+      limit: pageSize,
+      offset
+    });
+
+    logger.info("Folios retrieved", {
+      totalCount: result.total,
+      returnedCount: result.folios.length,
+      page,
+      pageSize,
+      filters
+    });
+
+    return {
+      folios: result.folios,
+      total: result.total,
+      page,
+      pageSize
+    };
+  }
+
   async getFolioById(id: number): Promise<Folio> {
     const folio = await this.folioRepository.findById(id);
     if (!folio) {

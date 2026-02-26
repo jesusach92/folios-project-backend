@@ -35,4 +35,38 @@ export class AuthController {
       res.status(400).json({ error: error.message });
     }
   }
+
+  async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: "User not authenticated" });
+        return;
+      }
+
+      const user = await this.authService.validateUser(req.user.id);
+      res.status(200).json({
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+        role: user.role_id,
+        section: user.section_id,
+        isActive: user.is_active
+      });
+    } catch (error: any) {
+      res.status(401).json({ error: error.message });
+    }
+  }
+
+  async logout(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: "User not authenticated" });
+        return;
+      }
+
+      res.status(200).json({ message: "Logout successful" });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 }

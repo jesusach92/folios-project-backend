@@ -32,78 +32,77 @@ const options = {
           properties: {
             id: { type: "integer" },
             email: { type: "string" },
-            full_name: { type: "string" },
-            role_id: { type: "integer" },
-            section_id: { type: ["integer", "null"] },
-            is_active: { type: "boolean" },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            fullName: { type: "string" },
+            role: { type: "integer" },
+            section: { type: ["integer", "null"] },
+            isActive: { type: "boolean" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         Folio: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folio_number: { type: "string" },
-            project_id: { type: "integer" },
+            folioNumber: { type: "string" },
+            projectId: { type: "integer" },
             quantity: { type: "integer" },
             status: { type: "string", enum: ["ACTIVE", "COMPLETED", "CANCELLED"] },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         Garment: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folio_id: { type: "integer" },
-            garment_number: { type: "integer" },
-            garment_code: { type: "string" },
+            folioId: { type: "integer" },
+            garmentNumber: { type: "integer" },
+            garmentCode: { type: "string" },
             status: { type: "string", enum: ["PENDING", "IN_PROGRESS", "COMPLETED"] },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         DeliveryDate: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folio_id: { type: "integer" },
-            due_date: { type: "string", format: "date" },
+            folioId: { type: "integer" },
+            dueDate: { type: "string", format: "date" },
             notes: { type: ["string", "null"] },
-            is_active: { type: "boolean" },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            isActive: { type: "boolean" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         FolioProcess: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folio_id: { type: "integer" },
-            garment_id: { type: "integer" },
-            process_id: { type: "integer" },
-            route_section_id: { type: "integer" },
+            folioId: { type: "integer" },
+            garmentId: { type: "integer" },
+            processId: { type: "integer" },
+            routeSectionId: { type: "integer" },
             status: { type: "string", enum: ["NOT_STARTED", "IN_PROGRESS", "PAUSED", "COMPLETED"] },
-            total_quantity: { type: "integer" },
-            completed_quantity: { type: "integer" },
-            started_at: { type: ["string", "null"], format: "date-time" },
-            completed_at: { type: ["string", "null"], format: "date-time" },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            totalQuantity: { type: "integer" },
+            completedQuantity: { type: "integer" },
+            startedAt: { type: ["string", "null"], format: "date-time" },
+            completedAt: { type: ["string", "null"], format: "date-time" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         ProcessProgress: {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folio_process_id: { type: "integer" },
-            status: { type: "string", enum: ["pending", "in_progress", "completed"] },
-            percentage: { type: "number" },
-            notes: { type: ["string", "null"] },
-            updated_by: { type: "integer" },
-            created_at: { type: "string", format: "date-time" },
-            updated_at: { type: "string", format: "date-time" }
+            folioProcessId: { type: "integer" },
+            quantityCompleted: { type: "integer" },
+            updatedByUserId: { type: "integer" },
+            reason: { type: "string" },
+            comments: { type: ["string", "null"] },
+            updatedAt: { type: "string", format: "date-time" }
           }
         },
         Error: {

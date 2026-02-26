@@ -15,6 +15,77 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
+ * /folios:
+ *   get:
+ *     summary: Get all Folios with filters and pagination
+ *     tags: [Folios]
+ *     parameters:
+ *       - name: search
+ *         in: query
+ *         schema:
+ *           type: string
+ *         description: Search by folio number (partial match)
+ *       - name: status
+ *         in: query
+ *         schema:
+ *           type: string
+ *           enum: [ACTIVE, COMPLETED, CANCELLED]
+ *         description: Filter by status
+ *       - name: projectId
+ *         in: query
+ *         schema:
+ *           type: integer
+ *         description: Filter by project ID
+ *       - name: sortBy
+ *         in: query
+ *         schema:
+ *           type: string
+ *           enum: [created_at, folio_number]
+ *           default: created_at
+ *         description: Sort by field
+ *       - name: sortOrder
+ *         in: query
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order
+ *       - name: page
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - name: pageSize
+ *         in: query
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Number of items per page
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of folios with pagination and filter info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 folios:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Folio'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ */
+
+/**
+ * @swagger
  * /folios/{id}:
  *   get:
  *     summary: Get Folio by ID
@@ -242,6 +313,9 @@ import { authMiddleware } from "../middlewares/auth";
 
 const router = Router();
 const folioController = new FolioController();
+
+// GET /folios - Get all folios with filters and pagination (MUST be before /:id to avoid conflict)
+router.get("/", authMiddleware, (req: Request, res: Response) => folioController.getFolios(req, res));
 
 router.get("/:id", authMiddleware, (req: Request, res: Response) => folioController.getFolio(req, res));
 
