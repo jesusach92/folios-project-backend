@@ -56,12 +56,20 @@ const options = {
           type: "object",
           properties: {
             id: { type: "integer" },
-            folioId: { type: "integer" },
             garmentNumber: { type: "integer" },
             garmentCode: { type: "string" },
             status: { type: "string", enum: ["PENDING", "IN_PROGRESS", "COMPLETED"] },
             createdAt: { type: "string", format: "date-time" },
             updatedAt: { type: "string", format: "date-time" }
+          }
+        },
+        FolioGarment: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            folioId: { type: "integer" },
+            garmentId: { type: "integer" },
+            createdAt: { type: "string", format: "date-time" }
           }
         },
         DeliveryDate: {
@@ -110,6 +118,58 @@ const options = {
           properties: {
             error: { type: "string" }
           }
+        },
+        Client: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            name: { type: "string" },
+            email: { type: "string", format: "email" },
+            phone: { type: "string" },
+            address: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
+          }
+        },
+        Project: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            projectNumber: { type: "string" },
+            clientId: { type: "integer" },
+            salesmanId: { type: "integer" },
+            deliveryDate: { type: "string", format: "date" },
+            status: { type: "string", enum: ["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"] },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
+          }
+        },
+        Section: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            name: { type: "string" },
+            description: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
+          }
+        },
+        Process: {
+          type: "object",
+          properties: {
+            id: { type: "integer" },
+            name: { type: "string" },
+            description: { type: "string" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" }
+          }
+        },
+        HealthStatus: {
+          type: "object",
+          properties: {
+            status: { type: "string", example: "ok" },
+            timestamp: { type: "string", format: "date-time" }
+          }
         }
       }
     },
@@ -119,7 +179,7 @@ const options = {
       }
     ]
   },
-  apis: ["./src/routes/*.ts"]
+  apis: ["./src/routes/*.ts", "./src/app.ts"]
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

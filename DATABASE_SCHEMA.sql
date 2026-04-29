@@ -69,6 +69,7 @@ CREATE TABLE `folios` (
   `folio_number` VARCHAR(100) NOT NULL UNIQUE,
   `project_id` INT NOT NULL,
   `quantity` INT NOT NULL,
+  `due_date` DATE ,
   `status` ENUM('ACTIVE', 'COMPLETED', 'CANCELLED') DEFAULT 'ACTIVE',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -80,16 +81,26 @@ CREATE TABLE `folios` (
 
 CREATE TABLE `garments` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `garment_description` TEXT NOT NULL,
+  `garment_code` VARCHAR(100) NOT NULL UNIQUE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_garment_code` (`garment_code`)
+);
+
+CREATE TABLE `folio_garments` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
   `folio_id` INT NOT NULL,
-  `garment_number` INT NOT NULL,
-  `garment_code` VARCHAR(100) NOT NULL,
+  `garment_id` INT NOT NULL,
+  `quantity` INT NOT NULL,
+  `route_id` INT NOT NULL,
   `status` ENUM('PENDING', 'IN_PROGRESS', 'COMPLETED') DEFAULT 'PENDING',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`folio_id`) REFERENCES `folios`(`id`),
+  FOREIGN KEY (`folio_id`) REFERENCES `folios`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`garment_id`) REFERENCES `garments`(`id`) ON DELETE CASCADE,
   KEY `idx_folio_id` (`folio_id`),
-  KEY `idx_garment_code` (`garment_code`),
-  UNIQUE KEY `unique_garment_in_folio` (`folio_id`, `garment_number`)
+  KEY `idx_garment_id` (`garment_id`)
 );
 
 CREATE TABLE `routes` (
@@ -108,6 +119,7 @@ CREATE TABLE `route_sections` (
   `sequence_order` INT NOT NULL,
   `is_active` BOOLEAN DEFAULT TRUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`route_id`) REFERENCES `routes`(`id`),
   FOREIGN KEY (`section_id`) REFERENCES `sections`(`id`),
   UNIQUE KEY `unique_route_section_order` (`route_id`, `sequence_order`),
@@ -129,9 +141,9 @@ CREATE TABLE `processes` (
   KEY `idx_type` (`type`)
 );
 
-CREATE TABLE `folio_routes` (
+CREATE TABLE `garments_folio_routes` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `folio_id` INT NOT NULL,
+  `garments_folio_id` INT NOT NULL,
   `route_id` INT NOT NULL,
   `current_route_section_id` INT NULL,
   `status` ENUM('NOT_STARTED', 'IN_PROGRESS', 'COMPLETED') DEFAULT 'NOT_STARTED',
@@ -139,10 +151,10 @@ CREATE TABLE `folio_routes` (
   `completed_at` DATETIME NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`folio_id`) REFERENCES `folios`(`id`),
+  FOREIGN KEY (`garments_folio_id`) REFERENCES `folio_garments`(`id`),
   FOREIGN KEY (`route_id`) REFERENCES `routes`(`id`),
   FOREIGN KEY (`current_route_section_id`) REFERENCES `route_sections`(`id`),
-  KEY `idx_folio_id` (`folio_id`),
+  KEY `idx_garments_folio_id` (`garments_folio_id`),
   KEY `idx_route_id` (`route_id`),
   KEY `idx_status` (`status`)
 );
@@ -187,28 +199,28 @@ CREATE TABLE `process_progress` (
 
 CREATE TABLE `delivery_dates` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `folio_id` INT NOT NULL,
+  `garment_folio_route_id` INT NOT NULL,
   `due_date` DATE NOT NULL,
   `notes` TEXT,
   `is_active` BOOLEAN DEFAULT TRUE,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`folio_id`) REFERENCES `folios`(`id`),
-  KEY `idx_folio_id` (`folio_id`),
+  FOREIGN KEY (`garment_folio_route_id`) REFERENCES `garments_folio_routes`(`id`),
+  KEY `idx_garment_folio_route_id` (`garment_folio_route_id`),
   KEY `idx_due_date` (`due_date`)
 );
 
 CREATE TABLE `delivery_date_history` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `folio_id` INT NOT NULL,
+  `garment_folio_route_id` INT NOT NULL,
   `old_due_date` DATE NOT NULL,
   `new_due_date` DATE NOT NULL,
   `changed_by_user_id` INT NOT NULL,
   `reason` VARCHAR(255) NOT NULL,
   `changed_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`folio_id`) REFERENCES `folios`(`id`),
+  FOREIGN KEY (`garment_folio_route_id`) REFERENCES `garments_folio_routes`(`id`),
   FOREIGN KEY (`changed_by_user_id`) REFERENCES `users`(`id`),
-  KEY `idx_folio_id` (`folio_id`),
+  KEY `idx_garment_folio_route_id` (`garment_folio_route_id`),
   KEY `idx_changed_at` (`changed_at`)
 );
 

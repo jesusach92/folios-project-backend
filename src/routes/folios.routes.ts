@@ -15,7 +15,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios:
+ * /api/folios:
  *   get:
  *     summary: Get all Folios with filters and pagination
  *     tags: [Folios]
@@ -86,7 +86,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios/{id}:
+ * /api/folios/{id}:
  *   get:
  *     summary: Get Folio by ID
  *     tags: [Folios]
@@ -114,7 +114,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios/project/{projectId}:
+ * /api/folios/project/{projectId}:
  *   get:
  *     summary: Get Folios by Project
  *     tags: [Folios]
@@ -144,7 +144,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios:
+ * /api/folios:
  *   post:
  *     summary: Create Folio
  *     tags: [Folios]
@@ -157,16 +157,20 @@ import { authMiddleware } from "../middlewares/auth";
  *           schema:
  *             type: object
  *             properties:
- *               project_id:
+ *               projectId:
  *                 type: integer
- *               folio_number:
+ *               folioNumber:
  *                 type: string
  *               quantity:
  *                 type: integer
+ *               dueDate:
+ *                 type: string
+ *                 format: date       
  *             required:
- *               - project_id
- *               - folio_number
+ *               - projectId
+ *               - folioNumber
  *               - quantity
+ *               - dueDate 
  *     responses:
  *       201:
  *         description: Folio created
@@ -181,7 +185,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios/{dateId}/delivery-date:
+ * /api/folios/{dateId}/delivery-date:
  *   put:
  *     summary: Update Delivery Date
  *     tags: [Delivery Dates]
@@ -222,45 +226,11 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /folios/{folioId}/garments:
- *   post:
- *     summary: Create Garment
- *     tags: [Garments]
- *     parameters:
- *       - name: folioId
- *         in: path
- *         required: true
- *         schema:
- *           type: integer
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               garment_number:
- *                 type: integer
- *               garment_code:
- *                 type: string
- *             required:
- *               - garment_number
- *               - garment_code
- *     responses:
- *       201:
- *         description: Garment created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 garment:
- *                   $ref: '#/components/schemas/Garment'
+ * /api/folios/{folioId}/garments:
  *   get:
  *     summary: Get Garments by Folio
- *     tags: [Garments]
+ *     description: Returns all garments associated with a specific folio. Use /api/garments for full garment management (create, update, delete, associate, disassociate).
+ *     tags: [Folios]
  *     parameters:
  *       - name: folioId
  *         in: path
@@ -271,7 +241,7 @@ import { authMiddleware } from "../middlewares/auth";
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: List of garments
+ *         description: List of garments associated with the folio
  *         content:
  *           application/json:
  *             schema:
@@ -283,11 +253,13 @@ import { authMiddleware } from "../middlewares/auth";
  *                     $ref: '#/components/schemas/Garment'
  *                 count:
  *                   type: integer
+ *       404:
+ *         description: Folio not found
  */
 
 /**
  * @swagger
- * /folios/{folioId}/close:
+ * /api/folios/{folioId}/close:
  *   post:
  *     summary: Close Folio
  *     tags: [Folios]
@@ -309,6 +281,71 @@ import { authMiddleware } from "../middlewares/auth";
  *               properties:
  *                 message:
  *                   type: string
+ */
+
+/**
+ * @swagger
+ * /api/folios/{id}:
+ *   put:
+ *     summary: Update Folio
+ *     tags: [Folios]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               folioNumber:
+ *                 type: string
+ *               quantity:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [ACTIVE, COMPLETED, CANCELLED]
+ *     responses:
+ *       200:
+ *         description: Folio updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 folio:
+ *                   $ref: '#/components/schemas/Folio'
+ *       404:
+ *         description: Folio not found
+ *   delete:
+ *     summary: Delete Folio
+ *     tags: [Folios]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Folio deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Folio not found
  */
 
 const router = Router();
@@ -335,11 +372,9 @@ router.put(
   (req: Request, res: Response) => folioController.updateDeliveryDate(req, res)
 );
 
-router.post(
-  "/:folioId/garments",
-  authMiddleware,
-  (req: Request, res: Response) => folioController.createGarment(req, res)
-);
+// NOTE: Garment management has been moved to independent /api/garments endpoints
+// GET /api/folios/{folioId}/garments - List garments for a folio (read-only)
+// For create, update, delete, or associate garments: use /api/garments endpoints
 
 router.get("/:folioId/garments", authMiddleware, (req: Request, res: Response) =>
   folioController.getGarmentsByFolio(req, res)

@@ -33,9 +33,10 @@ async function clearAllData(): Promise<void> {
       "delivery_dates",
       "process_progress",
       "folio_processes",
-      "folio_routes",
       "route_sections",
       "routes",
+      "garments_routes",
+      "folio_garments",
       "garments",
       "folios",
       "processes",
@@ -385,15 +386,41 @@ async function seedGarments(
 
     for (let i = 1; i <= quantity; i++) {
       const garmentCode = `GAR-${folioId}-${String(i).padStart(4, "0")}`;
-      const status =
-        i % 3 === 0 ? "COMPLETED" : i % 2 === 0 ? "IN_PROGRESS" : "PENDING";
+      const garmentDescription = `Garment #${i} for Folio ${folioId}`;
 
-      const [result] = await connection.execute<any>(
-        `INSERT INTO garments (folio_id, garment_number, garment_code, status)
-         VALUES (?, ?, ?, ?)`,
-        [folioId, i, garmentCode, status]
+      // Check if garment with this code already exists
+      const [existingGarment] = await connection.execute<any>(
+        "SELECT id FROM garments WHERE garment_code = ?",
+        [garmentCode]
       );
-      garmentIds.push(result.insertId);
+
+      let garmentId: number;
+      if (existingGarment && (existingGarment as any[])[0]) {
+        garmentId = (existingGarment as any[])[0].id;
+      } else {
+        const [result] = await connection.execute<any>(
+          `INSERT INTO garments (garment_description, garment_code)
+           VALUES (?, ?)`,
+          [garmentDescription, garmentCode]
+        );
+        garmentId = (result as any).insertId;
+      }
+
+      // Associate garment to folio in folio_garments table
+      try {
+        await connection.execute<any>(
+          `INSERT INTO folio_garments (folio_id, garment_id)
+           VALUES (?, ?)`,
+          [folioId, garmentId]
+        );
+      } catch (error: any) {
+        // Ignore duplicate key errors (association already exists)
+        if (error.code !== 'ER_DUP_ENTRY') {
+          throw error;
+        }
+      }
+
+      garmentIds.push(garmentId);
     }
 
     garmentsByFolio.set(folioId, garmentIds);
@@ -574,60 +601,33 @@ async function seedProcesses(
   return processBySectionMap;
 }
 
-async function seedFolioRoutes(
-  connection: mysql.PoolConnection,
-  folioIds: number[],
-  routeMap: Map<string, number>
-): Promise<Map<number, number>> {
-  console.log("\n🔗 Seeding folio routes...");
-
-  const folioRouteMap = new Map<number, number>();
-
-  for (let i = 0; i < folioIds.length; i++) {
-    const folioId = folioIds[i];
-    const routeName = i % 3 === 0 ? "Ruta Standard" : "Ruta Expedita";
-    const routeId = routeMap.get(routeName)!;
-
-    const status = i % 2 === 0 ? "IN_PROGRESS" : "NOT_STARTED";
-    const startedAt =
-      status === "IN_PROGRESS"
-        ? new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-        : null;
-
-    const [result] = await connection.execute<any>(
-      `INSERT INTO folio_routes (folio_id, route_id, status, started_at)
-       VALUES (?, ?, ?, ?)`,
-      [folioId, routeId, status, startedAt]
-    );
-
-    folioRouteMap.set(folioId, result.insertId);
-    console.log(`  ✓ Created folio route for folio ${folioId}`);
-  }
-
-  return folioRouteMap;
-}
 
 async function seedFolioProcesses(
   connection: mysql.PoolConnection,
   folioIds: number[],
   garmentsByFolio: Map<number, number[]>,
-  processBySectionMap: Map<number, number[]>
+  processBySectionMap: Map<number, number[]>,
+  routeMap: Map<string, number>
 ): Promise<void> {
   console.log("\n🔧 Seeding folio processes...");
 
   let processCount = 0;
 
-  for (const folioId of folioIds) {
+  for (let folioIdx = 0; folioIdx < folioIds.length; folioIdx++) {
+    const folioId = folioIds[folioIdx];
     const garmentIds = garmentsByFolio.get(folioId) || [];
 
+    // Select a route for this folio
+    const routeName = folioIdx % 3 === 0 ? "Ruta Standard" : "Ruta Expedita";
+    const routeId = routeMap.get(routeName)!;
+
+    // Get route sections for the selected route
     const [routeData] = await connection.execute<any>(
       `SELECT rs.id, rs.section_id, rs.sequence_order
-       FROM folio_routes fr
-       JOIN routes r ON fr.route_id = r.id
-       JOIN route_sections rs ON r.id = rs.route_id
-       WHERE fr.folio_id = ? AND rs.is_active = TRUE
+       FROM route_sections rs
+       WHERE rs.route_id = ? AND rs.is_active = TRUE
        ORDER BY rs.sequence_order`,
-      [folioId]
+      [routeId]
     );
 
     for (const route of routeData) {
@@ -771,12 +771,12 @@ async function main(config: SeedConfig = {}): Promise<void> {
     const garmentsByFolio = await seedGarments(connection, folioIds);
     const routeMap = await seedRoutes(connection, sectionIds);
     const processBySectionMap = await seedProcesses(connection, sectionIds);
-    await seedFolioRoutes(connection, folioIds, routeMap);
     await seedFolioProcesses(
       connection,
       folioIds,
       garmentsByFolio,
-      processBySectionMap
+      processBySectionMap,
+      routeMap
     );
     await seedDeliveryDates(connection, folioIds);
     await seedAuditLogs(connection, userIds, folioIds);

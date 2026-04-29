@@ -12,7 +12,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/me:
+ * /api/users/me:
  *   get:
  *     summary: Get Current User Profile
  *     tags: [Users]
@@ -42,11 +42,11 @@ import { UserRole } from "../types";
  *           schema:
  *             type: object
  *             properties:
- *               full_name:
+ *               fullName:
  *                 type: string
  *                 example: John Updated Doe
  *             required:
- *               - full_name
+ *               - fullName
  *     responses:
  *       200:
  *         description: Profile updated successfully
@@ -62,11 +62,11 @@ import { UserRole } from "../types";
  *                       type: integer
  *                     email:
  *                       type: string
- *                     full_name:
+ *                     fullName:
  *                       type: string
- *                     role_id:
+ *                     roleId:
  *                       type: integer
- *                     section_id:
+ *                     sectionId:
  *                       type: integer
  *                       nullable: true
  *       400:
@@ -76,7 +76,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/me/password:
+ * /api/users/me/password:
  *   put:
  *     summary: Change Password (Authenticated User Only)
  *     tags: [Users]
@@ -118,7 +118,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/list:
+ * /api/users/list:
  *   get:
  *     summary: List All Users
  *     tags: [Users]
@@ -142,7 +142,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/role/{role}:
+ * /api/users/role/{role}:
  *   get:
  *     summary: Get Users by Role
  *     tags: [Users]
@@ -173,7 +173,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users:
+ * /api/users:
  *   post:
  *     summary: Create New User (Admin Only)
  *     tags: [Users]
@@ -194,14 +194,14 @@ import { UserRole } from "../types";
  *                 type: string
  *                 format: password
  *                 example: SecurePassword123!
- *               full_name:
+ *               fullName:
  *                 type: string
  *                 example: John Operator
- *               role_id:
+ *               roleId:
  *                 type: integer
  *                 description: UserRole enum value (1=ADMIN, 2=PLANNING, 3=SECTION_CHIEF, 4=OPERATOR, 5=SALESMAN, 6=MANAGER)
  *                 example: 4
- *               section_id:
+ *               sectionId:
  *                 type: integer
  *                 description: Optional section ID (required for SECTION_CHIEF and OPERATOR roles)
  *                 nullable: true
@@ -209,8 +209,8 @@ import { UserRole } from "../types";
  *             required:
  *               - email
  *               - password
- *               - full_name
- *               - role_id
+ *               - fullName
+ *               - roleId
  *     responses:
  *       201:
  *         description: User created successfully
@@ -226,14 +226,14 @@ import { UserRole } from "../types";
  *                       type: integer
  *                     email:
  *                       type: string
- *                     full_name:
+ *                     fullName:
  *                       type: string
- *                     role_id:
+ *                     roleId:
  *                       type: integer
- *                     section_id:
+ *                     sectionId:
  *                       type: integer
  *                       nullable: true
- *                     is_active:
+ *                     isActive:
  *                       type: boolean
  *       400:
  *         description: Validation error (invalid email, role, section, or email already exists)
@@ -245,7 +245,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/{id}/admin-update:
+ * /api/users/{id}/admin-update:
  *   put:
  *     summary: Admin Update User (Role and Password)
  *     tags: [Users]
@@ -289,11 +289,11 @@ import { UserRole } from "../types";
  *                       type: integer
  *                     email:
  *                       type: string
- *                     full_name:
+ *                     fullName:
  *                       type: string
- *                     role_id:
+ *                     roleId:
  *                       type: integer
- *                     section_id:
+ *                     sectionId:
  *                       type: integer
  *                       nullable: true
  *       400:
@@ -308,7 +308,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/{id}/assign-section:
+ * /api/users/{id}/assign-section:
  *   put:
  *     summary: Assign Section to User (ADMIN ONLY)
  *     tags: [Users]
@@ -328,12 +328,12 @@ import { UserRole } from "../types";
  *           schema:
  *             type: object
  *             properties:
- *               section_id:
+ *               sectionId:
  *                 type: integer
  *                 description: Section ID to assign
  *                 example: 1
  *             required:
- *               - section_id
+ *               - sectionId
  *     responses:
  *       200:
  *         description: Section assigned to user successfully
@@ -349,13 +349,13 @@ import { UserRole } from "../types";
  *                       type: integer
  *                     email:
  *                       type: string
- *                     full_name:
+ *                     fullName:
  *                       type: string
- *                     role_id:
+ *                     roleId:
  *                       type: integer
- *                     section_id:
+ *                     sectionId:
  *                       type: integer
- *                     is_active:
+ *                     isActive:
  *                       type: boolean
  *       400:
  *         description: Validation error (missing section_id or invalid section)
@@ -371,7 +371,7 @@ import { UserRole } from "../types";
 
 /**
  * @swagger
- * /users/assign-section:
+ * /api/users/assign-section:
  *   post:
  *     summary: Assign User to Section
  *     tags: [Users]

@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /sections/{id}:
+ * /api/sections/{id}:
  *   get:
  *     summary: Get Section by ID
  *     tags: [Sections]
@@ -40,7 +40,7 @@ import { authMiddleware } from "../middlewares/auth";
  *                       type: string
  *                     description:
  *                       type: string
- *                     created_at:
+ *                     createdAt:
  *                       type: string
  *                       format: date-time
  *       404:
@@ -49,7 +49,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /sections/{id}/users:
+ * /api/sections/{id}/users:
  *   get:
  *     summary: Get Section with Users
  *     tags: [Sections]
@@ -84,7 +84,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /sections/{id}/stats:
+ * /api/sections/{id}/stats:
  *   get:
  *     summary: Get Section Statistics
  *     tags: [Sections]
@@ -107,19 +107,19 @@ import { authMiddleware } from "../middlewares/auth";
  *                 stats:
  *                   type: object
  *                   properties:
- *                     total_users:
+ *                     totalUsers:
  *                       type: integer
- *                     total_processes:
+ *                     totalProcesses:
  *                       type: integer
- *                     completed_processes:
+ *                     completedProcesses:
  *                       type: integer
- *                     progress_percentage:
+ *                     progressPercentage:
  *                       type: number
  */
 
 /**
  * @swagger
- * /sections:
+ * /api/sections:
  *   get:
  *     summary: List All Sections
  *     tags: [Sections]
@@ -179,6 +179,68 @@ import { authMiddleware } from "../middlewares/auth";
  *                       type: integer
  *                     name:
  *                       type: string
+ */
+
+/**
+ * @swagger
+ * /api/sections/{id}:
+ *   put:
+ *     summary: Update Section
+ *     tags: [Sections]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Section updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 section:
+ *                   $ref: '#/components/schemas/Section'
+ *       404:
+ *         description: Section not found
+ *   delete:
+ *     summary: Delete Section
+ *     tags: [Sections]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Section deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Section not found
  */
 
 const router = Router();

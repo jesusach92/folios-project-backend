@@ -1,6 +1,6 @@
 import { FolioRepository } from "../repositories/FolioRepository";
 import { AuditRepository } from "../repositories/AuditRepository";
-import { Folio, Garment, DeliveryDate, AuditAction } from "../types";
+import { Folio, Garment, DeliveryDate, AuditAction, FolioGarment } from "../types";
 import logger from "../config/logger";
 
 export class FolioService {
@@ -59,8 +59,8 @@ export class FolioService {
     return this.folioRepository.findByProjectId(projectId, limit, offset);
   }
 
-  async createFolio(projectId: number, folioNumber: string, quantity: number, userId: number): Promise<Folio> {
-    const folio = await this.folioRepository.create(projectId, folioNumber, quantity);
+  async createFolio(projectId: number, folioNumber: string, quantity: number, duedate: Date, userId: number): Promise<Folio> {
+    const folio = await this.folioRepository.create(projectId, folioNumber, quantity, duedate);
 
     await this.auditRepository.log(
       AuditAction.CREATED,
@@ -119,19 +119,26 @@ export class FolioService {
   async createGarment(folioId: number, garmentNumber: number, garmentCode: string, userId: number): Promise<Garment> {
     await this.getFolioById(folioId);
 
-    const garment = await this.folioRepository.createGarment(folioId, garmentNumber, garmentCode);
+    // Create or find garment
+    let garment = await this.folioRepository.findGarmentByCode(garmentCode);
+    if (!garment) {
+      garment = await this.folioRepository.createGarment(garmentNumber, garmentCode);
+    }
+
+    // Associate garment to folio
+    await this.folioRepository.associateGarmentToFolio(folioId, garment.id);
 
     await this.auditRepository.log(
       AuditAction.CREATED,
       "GARMENT",
       garment.id,
       userId,
-      `Garment ${garmentCode} created in folio ${folioId}`,
+      `Garment ${garmentCode} associated to folio ${folioId}`,
       undefined,
-      JSON.stringify({ garmentNumber, garmentCode })
+      JSON.stringify({ garmentNumber, garmentCode, folioId })
     );
 
-    logger.info("Garment created", { garmentId: garment.id, folioId, garmentCode, userId });
+    logger.info("Garment associated to folio", { garmentId: garment.id, folioId, garmentCode, userId });
 
     return garment;
   }
@@ -139,6 +146,54 @@ export class FolioService {
   async getGarmentsByFolio(folioId: number): Promise<Garment[]> {
     await this.getFolioById(folioId);
     return this.folioRepository.getGarmentsByFolioId(folioId);
+  }
+
+  async associateExistingGarmentToFolio(folioId: number, garmentId: number, userId: number): Promise<FolioGarment> {
+    await this.getFolioById(folioId);
+    
+    const garment = await this.folioRepository.findGarmentById(garmentId);
+    if (!garment) {
+      throw new Error("Garment not found");
+    }
+
+    const association = await this.folioRepository.associateGarmentToFolio(folioId, garmentId);
+
+    await this.auditRepository.log(
+      AuditAction.CREATED,
+      "FOLIO_GARMENT",
+      association.id,
+      userId,
+      `Garment ${garment.garment_code} associated to folio ${folioId}`,
+      undefined,
+      JSON.stringify({ folioId, garmentId })
+    );
+
+    logger.info("Garment associated to folio", { folioId, garmentId, userId });
+
+    return association;
+  }
+
+  async disassociateGarmentFromFolio(folioId: number, garmentId: number, userId: number): Promise<void> {
+    await this.getFolioById(folioId);
+    
+    const garment = await this.folioRepository.findGarmentById(garmentId);
+    if (!garment) {
+      throw new Error("Garment not found");
+    }
+
+    await this.folioRepository.disassociateGarmentFromFolio(folioId, garmentId);
+
+    await this.auditRepository.log(
+      AuditAction.DELETED,
+      "FOLIO_GARMENT",
+      garmentId,
+      userId,
+      `Garment ${garment.garment_code} disassociated from folio ${folioId}`,
+      JSON.stringify({ folioId, garmentId }),
+      undefined
+    );
+
+    logger.info("Garment disassociated from folio", { folioId, garmentId, userId });
   }
 
   async closeFolio(folioId: number, userId: number): Promise<void> {

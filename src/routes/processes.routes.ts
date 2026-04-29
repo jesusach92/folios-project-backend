@@ -13,7 +13,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/{id}:
+ * /api/processes/{id}:
  *   get:
  *     summary: Get Process by ID
  *     tags: [Processes]
@@ -41,7 +41,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/garment/{garmentId}:
+ * /api/processes/garment/{garmentId}:
  *   get:
  *     summary: Get Processes for Garment
  *     tags: [Processes]
@@ -71,7 +71,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/{folioProcessId}/start:
+ * /api/processes/{folioProcessId}/start:
  *   post:
  *     summary: Start Process
  *     tags: [Processes]
@@ -97,7 +97,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/{folioProcessId}/pause:
+ * /api/processes/{folioProcessId}/pause:
  *   post:
  *     summary: Pause Process
  *     tags: [Processes]
@@ -123,7 +123,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/{folioProcessId}/progress:
+ * /api/processes/{folioProcessId}/progress:
  *   post:
  *     summary: Update Process Progress
  *     tags: [Process Progress]
@@ -166,7 +166,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/{folioProcessId}/history:
+ * /api/processes/{folioProcessId}/history:
  *   get:
  *     summary: Get Progress History
  *     tags: [Process Progress]
@@ -196,7 +196,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /processes/section/{sectionId}:
+ * /api/processes/section/{sectionId}:
  *   get:
  *     summary: Get Processes by Section
  *     tags: [Processes]
@@ -222,6 +222,42 @@ import { authMiddleware } from "../middlewares/auth";
  *                     $ref: '#/components/schemas/FolioProcess'
  *                 count:
  *                   type: integer
+ */
+
+/**
+ * @swagger
+ * /api/processes/{folioProcessId}/complete:
+ *   post:
+ *     summary: Complete Process
+ *     tags: [Processes]
+ *     parameters:
+ *       - name: folioProcessId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notes:
+ *                 type: string
+ *                 description: Optional completion notes
+ *     responses:
+ *       200:
+ *         description: Process completed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 const router = Router();

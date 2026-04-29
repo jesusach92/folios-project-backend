@@ -167,12 +167,15 @@ export interface Folio {
 
 export interface Garment {
   id: number;
-  folio_id: number;
-  garment_number: number;
+  garment_description: string;
   garment_code: string;
-  status: GarmentStatus;
+}
+
+export interface FolioGarment {
+  id: number;
+  folio_id: number;
+  garment_id: number;
   created_at: Date;
-  updated_at: Date;
 }
 
 export interface Client {
@@ -293,4 +296,28 @@ export interface AuditLog {
   new_value: string | null;
   description: string;
   timestamp: Date;
+}
+
+// ${ServiceName} Types
+export interface ${ServiceName} {
+  id: number;
+  // TODO: Add your properties here
+  created_at: Date;
+  updated_at: Date;
+}
+
+// Inventory Types
+export interface Inventory {
+  id: number;
+  name?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// DeliveryDates Types
+export interface DeliveryDates {
+  id: number;
+  name?: string;
+  created_at: Date;
+  updated_at: Date;
 }

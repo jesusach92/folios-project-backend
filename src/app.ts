@@ -13,6 +13,7 @@ import clientRoutes from "./routes/clients.routes";
 import projectRoutes from "./routes/projects.routes";
 import sectionRoutes from "./routes/sections.routes";
 import folioRoutes from "./routes/folios.routes";
+import garmentRoutes from "./routes/garments.routes";
 import processRoutes from "./routes/processes.routes";
 import demoRoutes from "./routes/demo.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
@@ -29,8 +30,21 @@ app.use((req, _res, next) => {
   next();
 });
 
-
-
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health Check
+ *     description: Returns the health status of the API server
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthStatus'
+ */
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
@@ -43,13 +57,10 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/sections", sectionRoutes);
 app.use("/api/folios", folioRoutes);
+app.use("/api/garments", garmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/processes", processRoutes);
 app.use("/api/admin/demo", demoRoutes);
-
-app.get("/health", (_req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
-});
 
 app.use(errorHandlingMiddleware);
 

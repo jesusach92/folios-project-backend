@@ -41,7 +41,8 @@ export class DashboardRepository {
         ) as progreso
       FROM folios f
       LEFT JOIN projects p ON f.project_id = p.id
-      LEFT JOIN garments g ON f.id = g.folio_id
+      LEFT JOIN folio_garments fg ON f.id = fg.folio_id
+      LEFT JOIN garments g ON fg.garment_id = g.id
       WHERE f.status = 'ACTIVE'
       GROUP BY f.id, f.folio_number, f.quantity, p.name, f.status, f.created_at, f.updated_at
       ORDER BY f.created_at DESC

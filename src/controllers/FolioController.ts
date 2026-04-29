@@ -71,6 +71,7 @@ export class FolioController {
         projectId,
         folioNumber,
         quantity,
+        dueDate,  
         req.user.id
       );
       res.status(201).json({ folio });
@@ -128,6 +129,52 @@ export class FolioController {
       const { folioId } = req.params;
       const garments = await this.folioService.getGarmentsByFolio(parseInt(folioId));
       res.status(200).json({ garments, count: garments.length });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async associateGarmentToFolio(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      const { folioId } = req.params;
+      const { garmentId } = req.body;
+
+      if (!garmentId) {
+        res.status(400).json({ error: "garmentId is required" });
+        return;
+      }
+
+      const association = await this.folioService.associateExistingGarmentToFolio(
+        parseInt(folioId),
+        garmentId,
+        req.user.id
+      );
+      res.status(201).json({ association });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async disassociateGarmentFromFolio(req: Request, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      const { folioId, garmentId } = req.params;
+
+      await this.folioService.disassociateGarmentFromFolio(
+        parseInt(folioId),
+        parseInt(garmentId),
+        req.user.id
+      );
+      res.status(200).json({ message: "Garment disassociated successfully" });
     } catch (error: any) {
       res.status(400).json({ error: error.message });
     }

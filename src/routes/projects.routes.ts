@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /projects/{id}:
+ * /api/projects/{id}:
  *   get:
  *     summary: Get Project by ID
  *     tags: [Projects]
@@ -36,13 +36,13 @@ import { authMiddleware } from "../middlewares/auth";
  *                   properties:
  *                     id:
  *                       type: integer
- *                     project_number:
+ *                     projectNumber:
  *                       type: string
- *                     client_id:
+ *                     clientId:
  *                       type: integer
- *                     salesman_id:
+ *                     salesmanId:
  *                       type: integer
- *                     delivery_date:
+ *                     deliveryDate:
  *                       type: string
  *                       format: date
  *                     status:
@@ -53,7 +53,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /projects/{id}/stats:
+ * /api/projects/{id}/stats:
  *   get:
  *     summary: Get Project Statistics
  *     tags: [Projects]
@@ -76,19 +76,19 @@ import { authMiddleware } from "../middlewares/auth";
  *                 stats:
  *                   type: object
  *                   properties:
- *                     total_folios:
+ *                     totalFolios:
  *                       type: integer
- *                     completed_folios:
+ *                     completedFolios:
  *                       type: integer
- *                     pending_folios:
+ *                     pendingFolios:
  *                       type: integer
- *                     progress_percentage:
+ *                     progressPercentage:
  *                       type: number
  */
 
 /**
  * @swagger
- * /projects:
+ * /api/projects:
  *   get:
  *     summary: List All Projects
  *     tags: [Projects]
@@ -109,9 +109,9 @@ import { authMiddleware } from "../middlewares/auth";
  *                     properties:
  *                       id:
  *                         type: integer
- *                       project_number:
+ *                       projectNumber:
  *                         type: string
- *                       client_id:
+ *                       clientId:
  *                         type: integer
  *                 count:
  *                   type: integer
@@ -127,19 +127,19 @@ import { authMiddleware } from "../middlewares/auth";
  *           schema:
  *             type: object
  *             properties:
- *               project_number:
+ *               projectNumber:
  *                 type: string
- *               client_id:
+ *               clientId:
  *                 type: integer
- *               salesman_id:
+ *               salesmanId:
  *                 type: integer
- *               delivery_date:
+ *               deliveryDate:
  *                 type: string
  *                 format: date
  *             required:
- *               - project_number
- *               - client_id
- *               - delivery_date
+ *               - projectNumber
+ *               - clientId
+ *               - deliveryDate
  *     responses:
  *       201:
  *         description: Project created
@@ -153,13 +153,13 @@ import { authMiddleware } from "../middlewares/auth";
  *                   properties:
  *                     id:
  *                       type: integer
- *                     project_number:
+ *                     projectNumber:
  *                       type: string
  */
 
 /**
  * @swagger
- * /projects/client/{clientId}:
+ * /api/projects/client/{clientId}:
  *   get:
  *     summary: Get Projects by Client
  *     tags: [Projects]
@@ -186,7 +186,7 @@ import { authMiddleware } from "../middlewares/auth";
  *                     properties:
  *                       id:
  *                         type: integer
- *                       project_number:
+ *                       projectNumber:
  *                         type: string
  *                 count:
  *                   type: integer
@@ -194,7 +194,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /projects/salesman/{salesmanId}:
+ * /api/projects/salesman/{salesmanId}:
  *   get:
  *     summary: Get Projects by Salesman
  *     tags: [Projects]
@@ -221,10 +221,80 @@ import { authMiddleware } from "../middlewares/auth";
  *                     properties:
  *                       id:
  *                         type: integer
- *                       project_number:
+ *                       projectNumber:
  *                         type: string
  *                 count:
  *                   type: integer
+ */
+
+/**
+ * @swagger
+ * /api/projects/{id}:
+ *   put:
+ *     summary: Update Project
+ *     tags: [Projects]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               projectNumber:
+ *                 type: string
+ *               clientId:
+ *                 type: integer
+ *               salesmanId:
+ *                 type: integer
+ *               deliveryDate:
+ *                 type: string
+ *                 format: date
+ *               status:
+ *                 type: string
+ *                 enum: [PENDING, IN_PROGRESS, COMPLETED, CANCELLED]
+ *     responses:
+ *       200:
+ *         description: Project updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 project:
+ *                   $ref: '#/components/schemas/Project'
+ *       404:
+ *         description: Project not found
+ *   delete:
+ *     summary: Delete Project
+ *     tags: [Projects]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Project deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Project not found
  */
 
 const router = Router();

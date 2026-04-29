@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /clients/{id}:
+ * /api/clients/{id}:
  *   get:
  *     summary: Get Client by ID
  *     tags: [Clients]
@@ -53,7 +53,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /clients:
+ * /api/clients:
  *   get:
  *     summary: List All Clients
  *     tags: [Clients]
@@ -128,7 +128,7 @@ import { authMiddleware } from "../middlewares/auth";
 
 /**
  * @swagger
- * /clients/search:
+ * /api/clients/search:
  *   get:
  *     summary: Search Clients
  *     tags: [Clients]
@@ -161,6 +161,72 @@ import { authMiddleware } from "../middlewares/auth";
  *                         type: string
  *                 count:
  *                   type: integer
+ */
+
+/**
+ * @swagger
+ * /api/clients/{id}:
+ *   put:
+ *     summary: Update Client
+ *     tags: [Clients]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Client updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 client:
+ *                   $ref: '#/components/schemas/Client'
+ *       404:
+ *         description: Client not found
+ *   delete:
+ *     summary: Delete Client
+ *     tags: [Clients]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Client deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Client not found
  */
 
 const router = Router();
