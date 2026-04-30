@@ -66,7 +66,7 @@ CREATE TABLE `projects` (
 
 CREATE TABLE `folios` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `folio_number` VARCHAR(100) NOT NULL UNIQUE,
+  `folio_number` VARCHAR(100) NOT NULL,
   `project_id` INT NOT NULL,
   `quantity` INT NOT NULL,
   `due_date` DATE ,
